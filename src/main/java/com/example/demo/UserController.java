@@ -3,8 +3,6 @@ package com.example.demo;
 
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +18,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private UserRipository userRepository;
+    private UserRepository userRepository;
 
     /**
      * Get all users list.
@@ -47,7 +45,8 @@ public class UserController {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found on ::" + userId));
         return ResponseEntity.ok().body(user);
 
-}
+    }
+
     /**
      * create user user.
      *
@@ -56,14 +55,14 @@ public class UserController {
      */
 
     @PostMapping("/users")
-    public User createUser(@Valid @RequestBody User user){
+    public User createUser(@Valid @RequestBody User user) {
         return userRepository.save(user);
     }
 
     /**
      * Update user response entity.
      *
-     * @param userId the user id.
+     * @param userId      the user id.
      * @param userDetails the user details.
      * @return the response entity.
      * @throws ResourceNotFoundException the resource not found exception.
@@ -72,35 +71,43 @@ public class UserController {
     @PutMapping("/users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable(value = "id") Long userId,
                                            @Valid @RequestBody User userDetails)
-        throws ResourceNotFoundException{
-            User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("" +
-                    "User not found on ::"+userId));
-            user.setEmail(userDetails.getEmail());
-            user.setLastName(userDetails.getLastName());
-            user.setFirstName(userDetails.getFirstName());
-            user.setUpdatedAt(new Date());
-            final User updateUser = userRepository.save(user);
-            return ResponseEntity.ok(updateUser);
-            }
+            throws ResourceNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("" +
+                "User not found on ::" + userId));
+        user.setEmail(userDetails.getEmail());
+        user.setLastName(userDetails.getLastName());
+        user.setFirstName(userDetails.getFirstName());
+        user.setUpdatedAt(new Date());
+        final User updateUser = userRepository.save(user);
+        return ResponseEntity.ok(updateUser);
+    }
 
     /**
      * Deleet user map.
+     *
      * @param userId the user id.
      * @return the map.
      * @throw Exception the exception.
      */
 
     @DeleteMapping("/user/{id}")
-    public Map<String,Boolean> deleteUser(@PathVariable(value="id")Long userId) throws Exception
-    {
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException(
-                "User not found on ::"+userId));
+    public Map<String, Boolean> deleteUser(@PathVariable(value = "id") Long userId) throws Exception {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(
+                "User not found on ::" + userId));
         userRepository.delete(user);
-        Map<String,Boolean> response = new HashMap<>();
-        response.put("deleted",Boolean.TRUE);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
         return response;
     }
 
-
+    @GetMapping("/test")
+    public String  test(){
+        User user = new User();
+        user.setFirstName("tina");
+        user.setLastName("sade");
+        user.setEmail("tina@gmail.com");
+        User savedUser = userRepository.save(user);
+        return savedUser.toString();
+    }
 
 }
